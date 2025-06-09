@@ -41,7 +41,6 @@ def run_folder(model, args, config, device, verbose=False):
     sample_rate = 44100
     if 'sample_rate' in config.audio:
         sample_rate = config.audio['sample_rate']
-    print('Total files found: {} Use sample rate: {}'.format(len(all_mixtures_path), sample_rate))
 
     instruments = prefer_target_instrument(config)[:]
 
@@ -153,20 +152,16 @@ def proc_folder(args):
     if args.force_cpu:
         device = "cpu"
     elif torch.cuda.is_available():
-        print('CUDA is available, use --force_cpu to disable it.')
         device = "cuda"
         device = f'cuda:{args.device_ids[0]}' if type(args.device_ids) == list else f'cuda:{args.device_ids}'
     elif torch.backends.mps.is_available():
         device = "mps"
-
-    print("Using device: ", device)
 
     model_load_start_time = time.time()
     torch.backends.cudnn.benchmark = True
 
     model, config = get_model_from_config(args.model_type, args.config_path)
     if args.start_check_point != '':
-        print('Start from checkpoint: {}'.format(args.start_check_point))
         if args.model_type in ['htdemucs', 'apollo']:
             state_dict = torch.load(args.start_check_point, map_location=device, weights_only=False)
             # Fix for htdemucs pretrained models
@@ -178,16 +173,12 @@ def proc_folder(args):
         else:
             state_dict = torch.load(args.start_check_point, map_location=device, weights_only=True)
         model.load_state_dict(state_dict)
-    print("Instruments: {}".format(config.training.instruments))
 
     # in case multiple CUDA GPUs are used and --device_ids arg is passed
     if type(args.device_ids) == list and len(args.device_ids) > 1 and not args.force_cpu:
         model = nn.DataParallel(model, device_ids = args.device_ids)
 
     model = model.to(device)
-
-    print("Model load time: {:.2f} sec".format(time.time() - model_load_start_time))
-    
 
     run_folder(model, args, config, device, verbose=True)
 
