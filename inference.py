@@ -55,7 +55,6 @@ def run_folder(model, args, config, device, verbose=False):
         detailed_pbar = True
 
     for path in all_mixtures_path:
-        print("Starting processing track: ", path)
         if not verbose:
             all_mixtures_path.set_postfix({'track': os.path.basename(path)})
         try:
