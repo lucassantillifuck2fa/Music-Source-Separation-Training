@@ -91,12 +91,18 @@ def main():
         print("Unsupported source format.")
         return
 
+    success = False
     title = target.get("TITLE", [""])[0]
     if title:
         target["TITLE"] = [title + " (Instrumental)"]
+        success = True
+
+    if success:
+        print(f"Metadata copied from {args.source_file} to {args.target_file}")
+    else:
+        print("No metadata was copied.")
 
     target.save()
-    print(f"Metadata copied from {args.source_file} to {args.target_file}")
-
+    
 if __name__ == "__main__":
     main()
