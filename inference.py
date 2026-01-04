@@ -101,13 +101,11 @@ def run_folder(model, args, config, device, verbose=False):
         for el in waveforms:
             waveforms[el] = waveforms[el] / len(full_result)
 
-        # Create a new `instr` in instruments list, 'instrumental' 
         if args.extract_instrumental:
-            instr = 'vocals' if 'vocals' in instruments else instruments[0]
-            if 'instrumental' not in instruments:
-                instruments.append('instrumental')
-            # Output "instrumental", which is an inverse of 'vocals' or the first stem in list if 'vocals' absent
-            waveforms['instrumental'] = mix_orig - waveforms[instr]
+            instr = instruments[0]
+            if 'invert' not in instruments:
+                instruments.append('invert')
+            waveforms['invert'] = mix_orig - waveforms[instr]
 
         for instr in instruments:
             estimates = waveforms[instr].T
